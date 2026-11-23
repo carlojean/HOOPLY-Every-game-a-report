@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="it"><head><link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png"><link rel="icon" type="image/png" sizes="64x64" href="/static/favicon-64.png"><link rel="shortcut icon" href="/static/favicon.ico"><link rel="apple-touch-icon" href="/static/apple-touch-icon.png"><link rel="manifest" href="/static/manifest.json"><meta name="theme-color" content="#1d2b4f"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="HOOPLY"><meta name="mobile-web-app-capable" content="yes"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HOOPLY – Every game, a report</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:#f1f3f6;color:#111;font-size:15px}
+header{position:sticky;top:0;z-index:5;background:#1d2b4f;color:#fff;display:flex;gap:8px;align-items:center;padding:8px 14px;flex-wrap:wrap}
+header h1{font-size:16px;margin:0 auto 0 0}
+button,select,input{font:inherit}
+button{cursor:pointer;border:1px solid #8a93a8;background:#fff;border-radius:6px;padding:6px 12px}
+button:hover:not(:disabled){background:#e6ecff}button:disabled{opacity:.45;cursor:not-allowed}
+button.pri{background:#2a62d9;color:#fff;border-color:#1c47a8}button.pri:hover:not(:disabled){background:#1f4fb5}
+button.dng{background:#fff0f0;border-color:#d33;color:#a00}
+header button{background:#2e3f6c;color:#fff;border-color:#55689a}
+main{padding:14px;max-width:1500px;margin:auto}
+.card{background:#fff;border:1px solid #c9ced8;border-radius:8px;padding:12px;margin-bottom:12px}
+input,select{border:1px solid #aab;border-radius:5px;padding:5px 7px}
+table{border-collapse:collapse;width:100%}th,td{border:1px solid #bbb;padding:3px 6px;text-align:center}th{background:#eef0f4}
+td.l,th.l{text-align:left}
+.err{background:#ffe3e3;border:1px solid #d33;color:#900;padding:8px;border-radius:6px;margin:8px 0}
+.steps{display:flex;gap:6px;margin-bottom:10px}.steps span{padding:4px 12px;border-radius:14px;background:#dde;font-size:13px}.steps span.on{background:#2a62d9;color:#fff}
+.prow{display:grid;grid-template-columns:28px 80px 1fr 1fr 80px 40px 34px;gap:6px;margin-bottom:5px;align-items:center}
+input:not([type=number]):not([type=checkbox]):not([type=radio]):not([type=date]),textarea{text-transform:uppercase}
+.lrow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid #e3e6ee;min-height:52px}
+.lrow button{min-width:56px;min-height:46px;font-size:26px;font-weight:700;line-height:1;touch-action:manipulation}
+.lrow.sel{background:#e8f1ff}.lrow.off{background:#eee;color:#999}
+.chosen{margin:4px 0 12px;min-height:30px}.chosen .empty{color:#888;padding:8px}
+.nbadge{display:inline-block;min-width:34px;text-align:center;background:#1d2b53;color:#fff;font-weight:800;font-size:18px;border-radius:8px;padding:3px 6px;margin-right:8px}
+.lrow.off .nbadge{background:#999}.lrow .nm{font-weight:400;font-size:13px}.lrow small{font-size:11px}
+.modal.fs{padding:0;background:#fff;overflow:hidden}
+.modal.fs .box{max-width:none;margin:0;border-radius:0;height:100%;overflow:auto;padding:0 18px 30px}
+.stbar{position:sticky;top:0;background:#fff;z-index:2;padding:12px 0;border-bottom:1px solid #dde}
+.tsec{margin:18px 0 28px}.tsec h2 small{font-size:15px;font-weight:400;color:#555}
+.sgrid{display:grid;grid-template-columns:minmax(230px,300px) 1fr;gap:18px;align-items:start}
+.plist{position:sticky;top:78px;background:#f7f8fb;border-radius:10px;padding:10px}
+.pli{display:grid;grid-template-columns:14px auto 1fr;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid #e6e8ef}
+.pli i{width:14px;height:14px;border-radius:3px}.pli small{grid-column:2/4;color:#555;font-size:12px;margin-top:-4px}
+.pli .nbadge{min-width:28px;font-size:14px;padding:1px 4px;margin:0}.pli .nm{font-size:13px}
+.pies{display:flex;flex-wrap:wrap;gap:14px}.pie{text-align:center;min-width:170px}.pie b{display:block}.pie small{display:block;color:#555}
+.nofoul{background:#eef6ee;border:1px solid #9c9;border-radius:8px;padding:12px;color:#363;font-weight:600}
+@media(max-width:760px){.sgrid{grid-template-columns:1fr}.plist{position:static}}
+.stat h3{margin:18px 0 4px}.stat svg{width:100%;height:auto;max-width:760px;display:block}.stat text{font-family:inherit}
+.stat .leg{display:flex;gap:12px;flex-wrap:wrap;font-size:14px;margin:4px 0}.stat .leg i{display:inline-block;width:14px;height:14px;border-radius:3px;margin-right:4px;vertical-align:-2px}
+.rowbtn button{min-height:40px;margin:2px}
+.bad{border:2px solid #d33!important;background:#fff0f0}
+.rowerr{color:#a00;font-size:12px;margin:-2px 0 7px 34px;font-weight:600}
+.sl{cursor:pointer}.sl:hover{opacity:.85;stroke:#222;stroke-width:3}#tip{position:fixed;z-index:9999;display:none;background:#1b2340;color:#fff;padding:7px 10px;border-radius:6px;font-size:14px;max-width:320px;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.numadd{margin:8px 0}.numadd input{width:90px;font-size:18px;padding:6px}.warnbox{background:#fff4d6;border:1px solid #e0a800;border-radius:6px;padding:8px 10px;margin:8px 0;font-size:14px}.kbtn{padding:4px 0}.kbtn.on{background:#1b5fd1;color:#fff;font-weight:700}
+.prow.head{font-size:12px;font-weight:600;color:#555}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:900px){.split{grid-template-columns:1fr}}
+.half{background:#fff;border:3px solid #2a62d9;border-radius:10px;padding:12px}.half.B{border-color:#d9542a}
+.half h2{margin:0 0 4px;font-size:20px}
+.score{font-size:64px;font-weight:800;line-height:1}
+.mini{display:grid;grid-template-columns:auto repeat(4,1fr);gap:2px;font-size:13px;margin:8px 0}
+.mini div{border:1px solid #ccc;padding:2px 4px;text-align:center}.mini .h{background:#eef0f4;font-weight:600}.mini .cur{background:#fff3b0}
+.ctl{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.ctl select{flex:1;min-width:180px;font-size:17px;padding:8px}
+.pl td{vertical-align:middle}
+.pl .act{white-space:nowrap;text-align:right}
+.pl .act button{min-width:52px;min-height:48px;font-size:20px;font-weight:700;margin-left:4px;padding:4px 10px;touch-action:manipulation}
+.pl .act button.f{background:#ffe9c4;border-color:#c80;font-size:16px;min-width:64px}
+.pl tr.out{background:#eee;color:#999}
+.pl tr.out button{opacity:.4}
+.half button.pri{min-height:40px;min-width:48px}
+.pts button{font-size:22px;font-weight:700;padding:10px 18px}
+.pts button.f{background:#ffe9c4;border-color:#c80}
+.log{max-height:200px;overflow:auto;border:1px solid #ddd;border-radius:6px}
+.log div{display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid #eee;font-size:14px}
+.badge{display:inline-block;background:#e33;color:#fff;border-radius:4px;padding:0 5px;font-size:12px}
+.lineup label{display:flex;gap:8px;align-items:center;padding:6px;border:1px solid #ccd;border-radius:6px;margin:4px 0;cursor:pointer}
+.lineup label.off{opacity:.5}
+.trophybtn{background:none;border:0;padding:0;min-height:0;cursor:pointer}.trophybtn:hover svg{filter:drop-shadow(0 0 4px #f5b800)}.mvpnum{font-size:40px;font-weight:800;color:#8a5f00}.mvpname{font-size:24px;font-weight:700}#bigtrophy svg{filter:drop-shadow(0 4px 8px rgba(184,130,10,.45))}.tscroll{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}.tscroll table{width:auto;min-width:100%}.split>*{min-width:0}table.parz td:first-child,table.parz th:first-child{position:sticky;left:0;background:#fff;z-index:1}table.parz th:first-child{background:#eef0f4}.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10;overflow:auto;padding:20px}
+.modal .box{background:#fff;border-radius:10px;padding:16px;max-width:1400px;margin:auto}
+.fo{background:#ffd0d0;font-weight:700}.big{font-size:18px;font-weight:700}
+.bar{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap}
+</style></head><body>
+<header><h1><a href="#" id="brand" title="Vai alle partite" onclick="location.hash='';goHome();return false" style="color:inherit;text-decoration:none;display:flex;align-items:center;gap:8px;line-height:1.05"><img src="/static/logo-48.png" alt="" width="34" height="34" style="border-radius:8px"><span><b style="font-size:20px;letter-spacing:.5px">HOOPLY</b><br><small style="font-weight:400;font-size:11px;opacity:.85">Every game, a report</small></span></a></h1>
+<button onclick="goHome()">Partite</button><button id="bNew" onclick="newMatch()">Nuova partita</button><button id="bTeams" onclick="goTeams()">Squadre</button><button id="bEdit" style="display:none" onclick="editRoster()">Modifica giocatori</button><button id="bSet" style="display:none" onclick="showSettings()">Impostazioni</button><button id="bEnd" class="dng" style="display:none" onclick="askFinish()">Termina partita</button>
+<button id="bStat" onclick="showStats(M)" disabled>Statistiche</button><button id="bSum" onclick="showSummary()" disabled>Situazione riassuntiva</button>
+<button id="bPdf" onclick="downloadPdf()" disabled>Scarica PDF</button></header>
+<main id="main"></main><div id="modal"></div>
+<script>
+var CFG, M=null, view='home', wiz=null, pick={A:[],B:[]};
+function $(s){return document.querySelector(s)}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
+var ACTIVE=null;
+function trackActive(j){if(j&&j.id&&j.phase&&j.teams){if(j.phase!=='finished'&&!j.readonly)ACTIVE=j.id;else if(ACTIVE===j.id)ACTIVE=null}}
+async function api(path,method,body){
+  var r=await fetch('/api'+path,{method:method||'GET',headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});
+  var j=await r.json().catch(function(){return{}}); if(!r.ok) throw new Error(j.error||('Errore '+r.status)); var wasFF=M&&j&&M.id===j.id&&!M.forfeit;trackActive(j);
+  if(j&&j.forfeit&&wasFF)setTimeout(function(){alert('⚠ '+j.forfeit.text+'.\n\n'+(j.forfeit.winner?'I tempi regolari non giocati vengono assegnati alla squadra vincitrice (3 punti, 1 alla squadra che ha perso il forfait).':'Nessun punto assegnato per i tempi non giocati.'))},150);
+  return j;}
+function toast(e){alert(e.message||e)}
+function tl(k){return k<=M.n_tempi?k+'° tempo':'Tempo supplementare'}
+function ts(k){return k<=M.n_tempi?'T'+k:'Suppl.'}
+function sq(a){return a&&a.length?a.join(' '):'–'}
+function nm(p){return p.last_name+' '+p.first_name+(p.captain?' (K)':'')}
+function pname(p){return '#'+p.number+' '+nm(p)}
+function setHdr(){var n=$('#bNew');if(n){n.disabled=!!ACTIVE;n.title=ACTIVE?'C\'è una partita in corso: terminala prima':'';}
+  var ed=$('#bEdit');if(ed)ed.style.display=(M&&view==='match'&&M.phase!=='finished'&&!M.readonly)?'':'none';var bs_=$('#bSet');if(bs_)bs_.style.display=(M&&view==='match'&&!M.readonly&&!M.forfeit&&!M.editing)?'':'none';var e=$('#bEnd');if(e)e.style.display=(M&&view==='match'&&M.phase!=='finished'&&!M.readonly)?'':'none';
+  var s=M&&view!=='home'&&view!=='wizard';$('#bSum').disabled=!s;var bs=$('#bStat');if(bs)bs.disabled=!s;$('#bPdf').disabled=!(s&&M.phase==='finished')}
+
+/* ---------- home ---------- */
+async function goHome(){view='home';M=null;setHdr();var l=await api('/matches');LIST=l;
+  ACTIVE=null;l.forEach(function(x){if(x.phase!=='finished'&&!x.readonly&&!ACTIVE)ACTIVE=x.id});setHdr();
+  var h='<div class="card"><div class="bar"><h2 style="margin:0">Partite</h2><button class="pri" '+(ACTIVE?'disabled title="Termina prima la partita in corso"':'')+' onclick="newMatch()">+ Nuova partita</button></div>';
+  if(ACTIVE)h+='<div class="err" style="background:#fff6dd;border-color:#c80;color:#640">C\'è una partita in corso: riaprila per proseguire o terminarla. Solo dopo potrai crearne una nuova.</div>';
+  if(!l.length)h+='<p>Nessuna partita salvata. Crea la prima con “Nuova partita”.</p>';
+  else{h+='<table><tr><th>#</th><th>Data</th><th class="l">Squadre</th><th>Punteggio</th><th>Stato</th><th>MVP</th><th></th></tr>';
+   l.forEach(function(m){var st=m.phase==='finished'?(m.forfeit?'Conclusa (forfait)':'Conclusa'):m.readonly?'Non terminata':m.phase==='ask_ot'?'Tempi conclusi – supplementare?':((m.tempo>m.n_tempi?'Supplementare':m.tempo+'° tempo')+(m.phase==='playing'?' in corso':' – scelta giocatori'));
+    h+='<tr><td>'+m.id+'</td><td>'+fmtDate(m.created)+'</td><td class="l">'+esc(m.A)+' – '+esc(m.B)+'</td><td class="big">'+m.scoreA+' – '+m.scoreB+'</td><td>'+st+'</td><td>'+(m.mvp?'<button class="trophybtn" title="MVP: #'+m.mvp.number+' '+esc(m.mvp.name)+'" onclick="mvpModal('+m.id+')">'+trophy(30)+'</button>':'')+'</td><td class="rowbtn" style="white-space:nowrap"><button onclick="openMatch('+m.id+')">'+(m.phase==='finished'||m.readonly?'Apri':'Riprendi')+'</button> <button onclick="statsOf('+m.id+')">Statistiche</button> '+(m.phase==='finished'?'<button class="pri" onclick="location.href=\'/api/matches/'+m.id+'/pdf\'">Scarica referto</button> ':'')+'<button class="dng" '+(m.readonly?'disabled title="Partita di un giorno precedente: non modificabile"':'')+' onclick="delMatch('+m.id+')">Elimina</button></td></tr>'});
+   h+='</table>'}
+  $('#main').innerHTML=h+'</div>'}
+function trophy(sz){return '<svg viewBox="0 0 64 64" width="'+sz+'" height="'+sz+'" role="img" aria-label="Coppa MVP"><defs><linearGradient id="gld" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe680"/><stop offset=".5" stop-color="#f5b800"/><stop offset="1" stop-color="#b8820a"/></linearGradient></defs><path d="M16 6h32v4h9c0 11-5 18-13 20-2 5-6 8-9 9v8h8v5H21v-5h8v-8c-3-1-7-4-9-9C12 28 7 21 7 10h9zM12 14c0 6 3 10 7 12-1-4-2-8-2-12zM52 14h-5c0 4-1 8-2 12 4-2 7-6 7-12z" fill="url(#gld)" stroke="#8a5f00" stroke-width="1.4" stroke-linejoin="round"/><rect x="18" y="53" width="28" height="6" rx="1.5" fill="#8a5f00"/><path d="M32 13l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" fill="#fff6c8" stroke="#b8820a" stroke-width=".8"/></svg>'}
+var LIST=[];function mvpModal(id){var m=LIST.filter(function(x){return x.id===id})[0];if(!m||!m.mvp)return;var v=m.mvp;
+  $('#modal').innerHTML='<div class="modal" onclick="if(event.target===this)closeModal()"><div class="box" style="max-width:420px;text-align:center"><h2 style="margin-top:0">MVP della partita</h2><div id="bigtrophy">'+trophy(200)+'</div><div class="mvpnum">#'+v.number+'</div><div class="mvpname">'+esc(v.name)+(v.captain?' (K)':'')+'</div><p>'+esc(v.team)+' · <b>'+v.points+' punti</b></p><p style="color:#666">'+esc(m.A)+' '+m.scoreA+' – '+m.scoreB+' '+esc(m.B)+'</p><div class="bar"><span></span><button class="pri" onclick="closeModal()">Chiudi ✕</button></div></div></div>'}
+function mvpBlock(){var h='<div class="card mvpcard" style="text-align:left;max-width:560px;margin:14px auto"><h3 style="margin-top:0">'+trophy(26)+' MVP della partita <small style="font-weight:400;color:#666">(scelto dall\'allenatore)</small></h3>';
+  if(M.readonly)return h+(M.mvp?'<p><b>#'+M.mvp.number+' '+esc(M.mvp.name)+'</b> · '+esc(M.mvp.team)+' · '+M.mvp.points+' pt</p>':'<p>Nessun MVP assegnato.</p>')+'</div>';
+  h+='<select id="mvpSel" style="min-height:44px;font-size:16px;max-width:100%"><option value="">— scegli il giocatore —</option>';
+  ['A','B'].forEach(function(s){var t=M.teams[s];h+='<optgroup label="'+esc(t.name)+'">';t.players.forEach(function(p){h+='<option value="'+p.id+'"'+(M.mvp&&M.mvp.player_id===p.id?' selected':'')+'>#'+p.number+' '+esc(nm(p))+(p.captain?' (K)':'')+' – '+p.total+' pt</option>'});h+='</optgroup>'});
+  return h+'</select> <button class="pri" onclick="saveMvp()">'+(M.mvp?'Cambia MVP':'Assegna MVP')+'</button>'+(M.mvp?' <button onclick="clearMvp()">Rimuovi</button>':'')+'<div id="mvpErr" class="rowerr"></div></div>'}
+async function saveMvp(){var v=$('#mvpSel').value;if(!v){$('#mvpErr').textContent='⚠ Scegli un giocatore';return}try{M=await api('/matches/'+M.id+'/mvp','POST',{player_id:+v});renderFinished()}catch(e){toast(e)}}
+async function clearMvp(){try{M=await api('/matches/'+M.id+'/mvp','POST',{player_id:null});renderFinished()}catch(e){toast(e)}}
+function showSettings(){if(!M||M.readonly||M.forfeit||M.editing)return;var H=M.header,no='';for(var q=1;q<=CFG.max_tempi;q++)no+='<option value="'+q+'"'+(M.n_tempi===q?' selected':'')+'>'+q+'</option>';
+  var f=function(id,l,v){return '<label style="display:block;margin:6px 0">'+l+' <input id="set_'+id+'" value="'+esc(v||'')+'" style="width:100%"></label>'};
+  $('#modal').innerHTML='<div class="modal" onclick="if(event.target===this)closeModal()"><div class="box" style="max-width:560px"><h2 style="margin-top:0">Impostazioni partita</h2>'+
+   '<label style="display:block;margin:6px 0">Numero di tempi <select id="set_n">'+no+'</select></label><label style="display:block;margin:6px 0"><input type="checkbox" id="set_ot" '+(M.ot_enabled?'checked':'')+'> Prevedi tempo supplementare (solo con parità di punti e di progressivo; non per Under 9)</label>'+
+   '<p style="font-size:13px;color:#555;margin:4px 0">Aumentando i tempi su una partita conclusa questa viene riaperta: si scelgono i giocatori del nuovo tempo. Si può diminuire solo se i tempi tolti sono vuoti.</p>'+
+   f('category','Categoria',H.category)+f('venue','Campo / località',H.venue)+f('girone','Girone',H.girone)+f('gara_n','Gara n°',H.gara_n)+f('arbitri','Arbitri (separati da «/»)',H.arbitri)+f('segnapunti','Segnapunti',H.segnapunti)+f('cronometrista','Cronometrista',H.cronometrista)+
+   '<div id="setErr" class="err" style="display:none"></div><div class="bar"><button onclick="closeModal()">Annulla</button><button class="pri" onclick="saveSettings()">Salva</button></div></div></div>'}
+async function saveSettings(){var n1=+$('#set_n').value,body={n_tempi:n1,ot_enabled:$('#set_ot').checked};['category','venue','girone','gara_n','arbitri','segnapunti','cronometrista'].forEach(function(k){body[k]=$('#set_'+k).value});
+  var reopen=(M.phase==='finished'||M.phase==='ask_ot')&&M.tempo>=M.n_tempi&&n1>M.tempi_done;
+  if(reopen&&!confirm('ATTENZIONE: la partita è conclusa. Portando i tempi a '+n1+' viene RIAPERTA: si riparte dalla scelta giocatori del '+tl(M.tempi_done+1).toLowerCase()+'. Risultato finale, vincitore ed eventuale supplementare saranno ricalcolati alla fine del nuovo tempo'+(M.mvp?'; l\'MVP già assegnato resta (ricontrollalo a fine partita)':'')+(M.has_ot?'; i supplementari già giocati diventano tempi regolari (i loro punti restano)':'')+'.\n\nContinuare?'))return;
+  try{M=await api('/matches/'+M.id+'/settings','POST',body);closeModal();route()}catch(e){var x=$('#setErr');x.style.display='';x.textContent=e.message||e}}
+function fmtDate(s){var m=String(s||'').match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/);return m?m[3]+'/'+m[2]+'/'+m[1]+' '+m[4]+':'+m[5]:esc(s)}
+async function statsOf(id){try{showStats(await api('/matches/'+id))}catch(e){toast(e)}}
+async function delMatch(id){if(confirm('Eliminare definitivamente la partita '+id+'?')){await api('/matches/'+id+'/delete','POST',{});goHome()}}
+async function openMatch(id){M=await api('/matches/'+id);view='match';location.hash='m'+id;route()}
+function renderReadonly(){view='match';setHdr();var A=M.teams.A,B=M.teams.B;
+  $('#main').innerHTML='<div class="card" style="text-align:center"><h2>Partita del '+fmtDate(M.created)+' non terminata</h2><div class="err" style="background:#fff6dd;border-color:#c80;color:#640">Le partite di giorni precedenti non si possono più modificare: solo consultazione.</div><div class="score">'+A.score+' – '+B.score+'</div><p>'+esc(A.name)+' – '+esc(B.name)+'</p><button onclick="showSummary()">Situazione riassuntiva</button> <button onclick="showStats(M)">Statistiche</button></div>'}
+function route(){setHdr();pick={A:[],B:[]};pickErr={A:'',B:''};
+  if(M.readonly&&M.phase!=='finished')return renderReadonly();
+  if(M.phase==='ask_ot')renderAskOt();else if(M.phase==='lineup')renderLineup();else if(M.phase==='playing')renderPlay();else renderFinished();}
+
+/* ---------- wizard ---------- */
+function askFinish(){if(!M||M.phase==='finished')return;
+  $('#modal').innerHTML='<div class="modal" onclick="if(event.target===this)closeModal()"><div class="box" style="max-width:480px"><h2 style="margin-top:0">Terminare la partita?</h2><p>Vuoi terminare la partita? Il tempo in corso verrà chiuso (senza tempo supplementare) e non potrai più modificarla.</p><div class="bar"><button onclick="closeModal()">Annulla</button><button class="pri dng" id="bFinOk" onclick="doFinish()">Sì, termina partita</button></div></div></div>'}
+async function doFinish(){try{M=await api('/matches/'+M.id+'/finish','POST',{});closeModal();route()}catch(e){closeModal();toast(e)}}
+function editRoster(){if(!M||M.phase==='finished')return;
+  wiz={mode:'edit',step:0,errs:[],A:{},B:{}};
+  ['A','B'].forEach(function(s){var t=M.teams[s];wiz[s]={name:t.name,coach:t.coach||'',players:t.players.map(function(p){return{id:p.id,number:p.number,first_name:p.first_name,last_name:p.last_name,birth_year:p.birth_year,captain:p.captain,locked:p.locked}})}});
+  view='wizard';setHdr();renderWiz()}
+async function saveRoster(){try{var pl=function(s){return{name:wiz[s].name,coach:wiz[s].coach,players:wiz[s].players.map(function(p){return{id:p.id,number:p.number,first_name:p.first_name,last_name:p.last_name,birth_year:p.birth_year,captain:!!p.captain}})}};
+  M=await api('/matches/'+M.id+'/roster','POST',{A:pl('A'),B:pl('B')});wiz=null;view='match';route()}catch(e){renderWiz(e.message)}}
+function cancelEdit(){wiz=null;view='match';route()}
+var SAVED=[];function newMatch(){api('/teams').then(function(l){SAVED=l;if(wiz&&wiz.mode!=='team'&&wiz.mode!=='edit'&&view==='wizard')renderWiz()}).catch(function(){});if(ACTIVE){alert('C\'è una partita in corso: terminala prima di crearne una nuova.');return}view='wizard';M=null;setHdr();wiz={step:0,category:'',venue:'',girone:'',gara_n:'',arbitri:'',segnapunti:'',cronometrista:'',n_tempi:CFG.tempi,ot_enabled:CFG.ot_default,A:{name:'',coach:'',players:[]},B:{name:'',coach:'',players:[]}};
+  ['A','B'].forEach(function(s){for(var i=0;i<CFG.on_court;i++)wiz[s].players.push(blank(i+1))});renderWiz()}
+function blank(n){return{number:n,first_name:'',last_name:'',birth_year:'',captain:false}}
+function setCap(s,i){var on=!wiz[s].players[i].captain;wiz[s].players.forEach(function(p){p.captain=false});wiz[s].players[i].captain=on;renderWiz()}
+function bad(i,f){return (wiz.errs||[]).some(function(e){return e.row===i&&e.f.indexOf(f)>=0})?' class="bad"':''}
+function rowerr(i){var m=(wiz.errs||[]).filter(function(e){return e.row===i}).map(function(e){return e.text});return m.length?'<div class="rowerr">⚠ '+esc(m.join(' · '))+'</div>':''}
+function renderWiz(err){var st=wiz.step,h='<div class="card"><div class="steps">';if(wiz.mode==='team')h='<div class="card"><h2 style="margin-top:0">'+(wiz.teamId?'Modifica squadra':'Nuova squadra')+'</h2><div class="steps" style="display:none">';
+  (wiz.mode==='edit'?['1. Squadra A','2. Squadra B']:['1. Squadra A','2. Squadra B','3. Conferma']).forEach(function(t,i){h+='<span class="'+(i===st?'on':'')+'">'+t+'</span>'});h+='</div>';
+  if(err)h+='<div class="err">'+esc(err)+'</div>';
+  if(st<2){var s=st?'B':'A',t=wiz[s];
+   h+=wiz.mode==='team'?'':'<h2>Squadra '+s+'</h2>'+recallBar(s);
+   if(st===0&&wiz.mode!=='edit'&&wiz.mode!=='team'){var no='';for(var q=1;q<=CFG.max_tempi;q++)no+='<option value="'+q+'"'+(wiz.n_tempi==q?' selected':'')+'>'+q+'</option>';
+    h+='<div class="ctl"><label>Numero di tempi <select onchange="wiz.n_tempi=+this.value">'+no+'</select></label><label><input type="checkbox" '+(wiz.ot_enabled?'checked':'')+' onchange="wiz.ot_enabled=this.checked"> Prevedi tempo supplementare (te lo propongo solo se alla fine c\'è parità di punti e di progressivo; non per Under 9)</label></div>'+
+    '<div class="ctl"><input placeholder="Categoria" value="'+esc(wiz.category)+'" oninput="wiz.category=this.value"><input placeholder="Girone" value="'+esc(wiz.girone)+'" oninput="wiz.girone=this.value"><input placeholder="Gara n." value="'+esc(wiz.gara_n)+'" oninput="wiz.gara_n=this.value"><input placeholder="Campo di gioco" value="'+esc(wiz.venue)+'" oninput="wiz.venue=this.value"></div>'+
+    '<div class="ctl"><input placeholder="Arbitri" value="'+esc(wiz.arbitri)+'" oninput="wiz.arbitri=this.value"><input placeholder="Segnapunti" value="'+esc(wiz.segnapunti)+'" oninput="wiz.segnapunti=this.value"><input placeholder="Cronometrista" value="'+esc(wiz.cronometrista)+'" oninput="wiz.cronometrista=this.value"></div>';}
+   h+='<div class="ctl"><input'+bad(-1,'name')+' style="font-size:18px;flex:1" placeholder="Nome squadra '+s+'" value="'+esc(t.name)+'" oninput="wiz.'+s+'.name=this.value"><input style="flex:1" placeholder="Istruttore (facoltativo)" value="'+esc(t.coach)+'" oninput="wiz.'+s+'.coach=this.value"></div>'+rowerr(-1);
+   h+='<div class="prow head"><span></span><span>Maglia</span><span>Nome</span><span>Cognome</span><span>Anno nascita</span><span title="Capitano">K</span><span></span></div>';
+   t.players.forEach(function(p,i){var o='<option value="">—</option>';for(var y=CFG.year_max;y>=CFG.year_min;y--)o+='<option'+(String(p.birth_year)===String(y)?' selected':'')+'>'+y+'</option>';
+    h+='<div class="prow"><span>'+(i+1)+'</span><input'+bad(i,'number')+' type="number" min="0" max="99" value="'+esc(p.number)+'" oninput="wiz.'+s+'.players['+i+'].number=this.value">'+
+     '<input'+bad(i,'first')+' placeholder="Nome" value="'+esc(p.first_name)+'" oninput="wiz.'+s+'.players['+i+'].first_name=this.value">'+
+     '<input'+bad(i,'last')+' placeholder="Cognome" value="'+esc(p.last_name)+'" oninput="wiz.'+s+'.players['+i+'].last_name=this.value"><select'+bad(i,'year')+' onchange="wiz.'+s+'.players['+i+'].birth_year=this.value">'+o+'</select>'+
+     '<button class="kbtn'+(p.captain?' on':'')+'" title="Capitano (uno solo per squadra, facoltativo)" onclick="setCap(\''+s+'\','+i+')">K</button><button class="dng" title="Rimuovi" onclick="rmPlayer(\''+s+'\','+i+')" '+(p.locked?'disabled title="Ha già punti, falli o partecipazione: non si può rimuovere"':(wiz.mode!=='edit'&&wiz.mode!=='team'&&t.players.length<=CFG.on_court?'disabled':''))+'>×</button></div>'+rowerr(i)});
+   h+='<button onclick="addPlayer(\''+s+'\')" '+(t.players.length>=CFG.max_players?'disabled':'')+'>+ Aggiungi giocatore ('+t.players.length+'/'+CFG.max_players+')</button>';
+   h+=wiz.mode==='team'?'<p style="color:#555">Squadra salvata: maglie diverse, anno di nascita (almeno '+CFG.min_age+' anni), capitano facoltativo, fino a '+CFG.max_players+' giocatori. Si richiama in «Nuova partita».</p><div class="bar"><button onclick="goTeams()">Annulla</button><button class="pri" onclick="saveTeam()">Salva squadra</button></div>':'<p style="color:#555">'+(wiz.mode==='edit'?'Modifica giocatori: puoi aggiungere o correggere i giocatori; si possono rimuovere solo quelli senza punti, falli o presenze. Se una squadra scende sotto '+CFG.on_court+' giocatori utili la partita finisce per forfait. ':'')+'Servono almeno '+CFG.on_court+' giocatori; maglie diverse tra loro. Fino a '+CFG.max_players+' giocatori: oltre 12 il PDF ha 2 fogli (primi 12 per squadra nel primo, gli altri nel secondo).</p><div class="bar">'+(wiz.mode==='team'?'<button onclick="goTeams()">Annulla</button><button class="pri" onclick="saveTeam()">Salva squadra</button>':'<button '+(st?'':'disabled')+' onclick="wiz.step--;wiz.errs=[];renderWiz()">← Indietro</button>'+(wiz.mode!=='edit'?'<button onclick="saveAsTeam(\''+s+'\')" title="Salva questa squadra nell\'archivio Squadre">Salva come squadra</button>':'')+(wiz.mode==='edit'?'<button onclick="cancelEdit()">Annulla modifiche</button>':'')+'<button class="pri" onclick="wizNext()">'+(wiz.mode==='edit'&&st===1?'Salva e torna alla partita':'Avanti →')+'</button>')+'</div>';
+  }else{h+='<h2>Conferma</h2><div class="split">';['A','B'].forEach(function(s){var t=wiz[s];h+='<div><b>Squadra '+s+': '+esc(t.name)+(t.coach?' – istr. '+esc(t.coach):'')+'</b><table><tr><th>N.</th><th class="l">Giocatore</th><th>Anno</th></tr>';
+    t.players.slice().sort(function(a,b){return a.number-b.number}).forEach(function(p){h+='<tr><td>'+esc(p.number)+'</td><td class="l">'+esc(nm(p))+'</td><td>'+esc(p.birth_year)+'</td></tr>'});h+='</table></div>'});
+   h+='</div><p>Tempi: <b>'+wiz.n_tempi+'</b> · Tempo supplementare: <b>'+(wiz.ot_enabled?'sì, solo in caso di parità totale':'no')+'</b></p><div class="bar"><button onclick="wiz.step=1;renderWiz()">← Indietro</button><button class="pri" onclick="wizCreate()">Crea partita e inizia</button></div>'}
+  $('#main').innerHTML=h+'</div>'}
+function recallBar(s){if(wiz.mode==='edit')return '';var o='<option value="">— richiama squadra salvata —</option>';SAVED.forEach(function(t){o+='<option value="'+t.id+'">'+esc(t.name)+' ('+t.players.length+' giocatori)</option>'});
+  return '<div class="ctl recall"><select id="recall_'+s+'">'+o+'</select><button onclick="recallTeam(\''+s+'\')">Richiama</button>'+(SAVED.length?'':'<small style="color:#666">Nessuna squadra salvata: creale da «Squadre».</small>')+'</div>'}
+function recallTeam(s){var id=+$('#recall_'+s).value;if(!id)return;var t=SAVED.filter(function(x){return x.id===id})[0];if(!t)return;
+  var cur=wiz[s];if((cur.name.trim()||cur.players.some(function(p){return p.first_name.trim()||p.last_name.trim()}))&&!confirm('Sostituire nome e giocatori inseriti per la squadra '+s+' con la squadra salvata '+t.name+'?'))return;
+  wiz[s]={name:t.name,coach:t.coach||'',players:t.players.map(function(p){return{number:p.number,first_name:p.first_name,last_name:p.last_name,birth_year:p.birth_year,captain:p.captain}})};wiz.errs=[];renderWiz()}
+async function saveAsTeam(s){var v=validTeam(s);wiz.errs=v.errs;if(v.errs.length){renderWiz(v.msg);return}sortWiz();
+  try{var t=await api('/teams','POST',{name:wiz[s].name,coach:wiz[s].coach,players:wiz[s].players});SAVED=await api('/teams');renderWiz();toast('Squadra «'+t.name+'» salvata nell\'archivio Squadre')}catch(e){renderWiz(e.message)}}
+async function goTeams(){view='teams';M=null;wiz=null;setHdr();var l=[];try{l=await api('/teams')}catch(e){}SAVED=l;
+  var h='<div class="card"><div class="bar"><h2 style="margin:0">Squadre</h2><button class="pri" onclick="editTeam(0)">+ Nuova squadra</button></div>';
+  if(!l.length)h+='<p>Nessuna squadra salvata. Creane una con «Nuova squadra»: in «Nuova partita» potrai richiamarla.</p>';
+  else{h+='<table id="teamsTbl"><tr><th class="l">Squadra</th><th class="l">Istruttore</th><th>Giocatori</th><th class="l">Maglie</th><th></th></tr>';
+   l.forEach(function(t){h+='<tr><td class="l"><b>'+esc(t.name)+'</b></td><td class="l">'+esc(t.coach)+'</td><td>'+t.players.length+'</td><td class="l"><small>'+t.players.map(function(p){return p.number+' '+esc(p.last_name)+(p.captain?' (K)':'')}).join(' · ')+'</small></td><td class="rowbtn" style="white-space:nowrap"><button onclick="editTeam('+t.id+')">Modifica</button> <button class="dng" onclick="delTeam('+t.id+')">Elimina</button></td></tr>'});h+='</table>'}
+  $('#main').innerHTML=h+'<p><small>Le squadre salvate si richiamano in «Nuova partita»: i giocatori vengono copiati nella partita. Eliminare o modificare una squadra non cambia le partite già create.</small></p></div>'}
+function editTeam(id){var t=id?SAVED.filter(function(x){return x.id===id})[0]:null;view='wizard';wiz={mode:'team',teamId:id,step:0,errs:[],A:t?{name:t.name,coach:t.coach||'',players:t.players.map(function(p){return{number:p.number,first_name:p.first_name,last_name:p.last_name,birth_year:p.birth_year,captain:p.captain}})}:{name:'',coach:'',players:[blank(1)]}};setHdr();renderWiz()}
+async function saveTeam(){var v=validTeam('A');wiz.errs=v.errs;if(v.errs.length){renderWiz(v.msg.replace('Squadra A: ',''));var b=document.querySelector('.bad');if(b)b.focus();return}sortWiz();
+  try{await api('/teams'+(wiz.teamId?'/'+wiz.teamId:''),'POST',{name:wiz.A.name,coach:wiz.A.coach,players:wiz.A.players});wiz=null;goTeams()}catch(e){renderWiz(e.message)}}
+function delTeam(id){var t=SAVED.filter(function(x){return x.id===id})[0];if(!t)return;if(!confirm('Eliminare la squadra salvata «'+t.name+'»?\n\nLe partite già create non vengono modificate.'))return;api('/teams/'+id+'/delete','POST',{}).then(goTeams).catch(toast)}
+function addPlayer(s){var t=wiz[s];if(t.players.length>=CFG.max_players)return;var used={};t.players.forEach(function(p){used[p.number]=1});var n=1;while(used[n])n++;t.players.push(blank(n));renderWiz()}
+function rmPlayer(s,i){wiz[s].players.splice(i,1);renderWiz()}
+function validTeam(s){var t=wiz[s],errs=[],seen={},pm={};
+  if(!t.name.trim())errs.push({row:-1,f:['name'],text:'Inserisci il nome della squadra'});
+  function add(i,f,m){(pm[i]=pm[i]||{f:[],m:[]}).f.push(f);pm[i].m.push(m)}
+  t.players.forEach(function(p,i){
+   var okNum=!(p.number===''||isNaN(+p.number)||+p.number<0||+p.number>99);
+   if(!okNum)add(i,'number','maglia da 0 a 99');
+   if(!p.first_name.trim())add(i,'first','nome obbligatorio');
+   if(!p.last_name.trim())add(i,'last','cognome obbligatorio');
+   if(!p.birth_year)add(i,'year',"scegli l'anno di nascita");
+   if(okNum){var n=+p.number;if(seen[n]!==undefined){add(i,'number','maglia '+n+' già usata dal giocatore '+(seen[n]+1));add(seen[n],'number','maglia '+n+' duplicata (giocatore '+(i+1)+')')}else seen[n]=i}});
+  Object.keys(pm).forEach(function(i){errs.push({row:+i,f:pm[i].f,text:pm[i].m.join(', ')})});
+  var msg=errs.length?'Squadra '+s+': '+errs.length+(errs.length>1?' righe da correggere':' riga da correggere')+' (evidenziate in rosso). '+(errs[0].row>=0?'Giocatore '+(errs[0].row+1)+': ':'')+errs[0].text+'.':'';
+  return {msg:msg,errs:errs}}
+function wizNext(){var v=validTeam(wiz.step?'B':'A');wiz.errs=v.errs;if(!v.errs.length)sortWiz();if(!v.errs.length&&wiz.mode==='edit'&&wiz.step===1)return saveRoster();if(v.errs.length){renderWiz(v.msg);var b=document.querySelector('.bad');if(b){b.scrollIntoView({block:'center'});b.focus()}return}wiz.step++;renderWiz()}
+document.addEventListener('input',function(e){var t=e.target;if(t&&t.tagName&&(t.tagName==='TEXTAREA'||(t.tagName==='INPUT'&&/^(text|search|)$/.test(t.type||'')))&&t.value!==t.value.toUpperCase()){var a=t.selectionStart,b=t.selectionEnd;t.value=t.value.toUpperCase();try{t.setSelectionRange(a,b)}catch(_){}}},true);
+document.addEventListener('input',function(e){if(e.target.classList&&e.target.classList.contains('bad'))e.target.classList.remove('bad')});
+document.addEventListener('change',function(e){if(e.target.classList&&e.target.classList.contains('bad'))e.target.classList.remove('bad')});
+function sortWiz(){['A','B'].forEach(function(s){if(wiz[s])wiz[s].players.sort(function(a,b){return (+a.number)-(+b.number)})})}
+async function wizCreate(){try{sortWiz();M=await api('/matches','POST',wiz);view='match';route()}catch(e){renderWiz(e.message)}}
+
+/* ---------- scelta 4 giocatori ---------- */
+var pickErr={A:'',B:''};
+function editBanner(){if(!M.editing)return '';var rp=M.editing.resume_phase,back=rp==='finished'?'alla partita conclusa':rp==='playing'?'al '+tl(M.editing.resume_tempo).toLowerCase()+' in corso':rp==='ask_ot'?'alla proposta del supplementare':'alla scelta giocatori del '+tl(M.editing.resume_tempo).toLowerCase();
+  return '<div class="warnbox">✏️ <b>Modifica del '+tl(M.editing.tempo).toLowerCase()+'</b>: i dati precedenti di questo periodo sono stati eliminati, valgono solo i nuovi. Alla fine ('+(M.phase==='playing'?'«Termina modifica»':'scegli i giocatori e conferma')+') si torna '+back+'.</div>'}
+function renderLineup(){view='match';setHdr();var h=editBanner()+'<div class="card"><div class="bar"><h2 style="margin:0">'+tl(M.tempo)+' – scegli i '+CFG.on_court+' giocatori in campo</h2><span>'+(M.editable.length&&!M.editing?'<button onclick="editPeriods()">Modifica periodo precedente</button> ':'')+'<span class="big">'+M.teams.A.score+' – '+M.teams.B.score+'</span></span></div><div class="split">';
+  ['A','B'].forEach(function(s){var t=M.teams[s],full=pick[s].length>=CFG.on_court;
+   h+='<div class="lineup"><h3>Squadra '+s+': '+esc(t.name)+' ('+pick[s].length+'/'+CFG.on_court+')</h3><b>In campo</b><div class="chosen">';
+   if(!pick[s].length)h+='<div class="empty">nessun giocatore scelto</div>';
+   pick[s].slice().sort(function(a,b){return numOf(s,a)-numOf(s,b)}).forEach(function(id){var p=t.players.filter(function(x){return x.id===id})[0];h+='<div class="lrow sel"><span><span class="nbadge">'+p.number+'</span><span class="nm">'+esc(nm(p))+'</span> <small>'+p.total+' pt · '+p.fouls+' falli</small></span><button class="dng" title="Rimetti in lista" onclick="unpick(\''+s+'\','+id+')">−</button></div>'});
+   var lw=lineupWarn(s);if(lw)h+='<div class="warnbox">⚠ '+esc(lw)+'</div>';
+   h+='</div><div class="numadd"><label>N° maglia <input type="number" min="0" max="99" id="num_'+s+'" placeholder="es. 7" onkeydown="if(event.key===\'Enter\'){event.preventDefault();addNum(\''+s+'\')}"></label> <button class="pri" onclick="addNum(\''+s+'\')">Aggiungi</button></div>'+(pickErr[s]?'<div class="rowerr" id="nerr_'+s+'">⚠ '+esc(pickErr[s])+'</div>':'')+'<b>Disponibili</b><div>';
+   t.players.filter(function(p){return pick[s].indexOf(p.id)<0}).forEach(function(p){var dis=p.fouled_out||full;
+    h+='<div class="lrow'+(p.fouled_out?' off':'')+'"><span><span class="nbadge">'+p.number+'</span><span class="nm">'+esc(nm(p))+'</span> <small>('+p.birth_year+') · '+p.total+' pt · '+p.fouls+' falli</small>'+(p.fouled_out?' <span class="badge">'+CFG.max_fouls+' falli</span>':'')+'</span><button class="pri" '+(dis?'disabled':'')+' title="Aggiungi" onclick="doPick(\''+s+'\','+p.id+')">+</button></div>'});
+   h+='</div></div>'});
+  h+='</div><div class="bar"><span></span><button id="goBtn" class="pri" '+(pick.A.length===CFG.on_court&&pick.B.length===CFG.on_court?'':'disabled')+' onclick="startTempo()">'+(M.editing?'Conferma e modifica ':'Inizia ')+(M.tempo>M.n_tempi?'tempo supplementare':'tempo '+M.tempo)+'</button></div></div>';
+  $('#main').innerHTML=h;if(window._focusNum){var q=$('#num_'+window._focusNum);window._focusNum=null;if(q)q.focus()}}
+function numOf(s,id){var p=M.teams[s].players.filter(function(x){return x.id===id})[0];return p?p.number:0}
+function addNum(s){var inp=$('#num_'+s),v=(inp.value||'').trim(),t=M.teams[s];window._focusNum=s;
+  if(v===''||!/^\d{1,2}$/.test(v)){pickErr[s]='Inserisci un numero di maglia (0-99)';return renderLineup()}
+  var p=t.players.filter(function(x){return x.number===+v})[0];
+  if(!p)pickErr[s]='Maglia '+v+' non presente nella squadra '+s;
+  else if(pick[s].indexOf(p.id)>=0)pickErr[s]='#'+p.number+' '+nm(p)+' è già selezionato';
+  else if(p.fouled_out)pickErr[s]='#'+p.number+' '+nm(p)+' non è disponibile ('+CFG.max_fouls+' falli)';
+  else if(pick[s].length>=CFG.on_court)pickErr[s]='Hai già scelto '+CFG.on_court+' giocatori: rimettine in lista uno prima';
+  else{pickErr[s]='';pick[s].push(p.id)}
+  renderLineup()}
+function lineupWarn(s){ /* guida CSI: nel 2° periodo devono giocare atleti che non hanno giocato nel 1° (salvo squadre con 7 o meno atleti) */
+  if(M.tempo!==2||M.tempo>M.n_tempi)return '';var t=M.teams[s];if(t.players.length<=7)return '';
+  var sel=pick[s].map(function(id){return t.players.filter(function(x){return x.id===id})[0]}),prior=function(p){return p.entries.filter(function(e){return e<M.tempo}).length>0},played=sel.filter(prior),
+   rest=t.players.filter(function(p){return !p.fouled_out&&!prior(p)&&pick[s].indexOf(p.id)<0});
+  if(!played.length||!rest.length)return '';
+  return 'Squadra '+s+': nel 2° periodo devono giocare gli atleti che non hanno partecipato al 1° (la squadra ha più di 7 atleti). Hai scelto '+played.length+' atleta/i già sceso/i in campo ('+played.map(function(p){return '#'+p.number}).join(', ')+') mentre non hanno ancora giocato: '+rest.map(function(p){return '#'+p.number+' '+p.last_name}).join(', ')+'.'}
+function doPick(s,id){pickErr[s]='';var p=M.teams[s].players.filter(function(x){return x.id===id})[0];if(pick[s].length>=CFG.on_court||p.fouled_out||pick[s].indexOf(id)>=0)return;pick[s].push(id);renderLineup()}
+function unpick(s,id){var i=pick[s].indexOf(id);if(i>=0)pick[s].splice(i,1);renderLineup()}
+async function startTempo(){var w=['A','B'].map(lineupWarn).filter(Boolean);if(w.length&&!confirm('AVVISO regola del 2° periodo:\n\n'+w.join('\n\n')+'\n\nProcedere comunque?'))return;try{M=await api('/matches/'+M.id+'/start_tempo','POST',pick);route()}catch(e){toast(e)}}
+
+/* ---------- gioco ---------- */
+function renderPlay(){view='match';setHdr();var h=editBanner()+'<div class="bar"><h2 style="margin:0">'+tl(M.tempo)+(M.editing?' (modifica)':' in corso')+'</h2><span>'+(M.editable.length&&!M.editing?'<button onclick="editPeriods()">Modifica periodo precedente</button> ':'')+'<button class="pri" onclick="endTempo()">'+(M.editing?'Termina modifica ':'Termina ')+(M.tempo>M.n_tempi?'tempo supplementare':'tempo '+M.tempo)+'</button></span></div><div class="split">';
+  ['A','B'].forEach(function(s){var t=M.teams[s],on=(M.court[s]||[]).map(function(id){return t.players.filter(function(p){return p.id===id})[0]}),bench=t.players.filter(function(p){return !p.on_field});
+   h+='<div class="half '+s+'"><h2>Squadra '+s+': '+esc(t.name)+'</h2><div class="score">'+t.score+'</div><small>punteggio totale (progressivo)</small>';
+   h+='<div class="mini" style="grid-template-columns:auto repeat('+M.periods+',1fr)"><div class="h"></div>';for(var k=1;k<=M.periods;k++)h+='<div class="h">'+ts(k)+'</div>';
+   h+='<div class="h">Punti</div>';for(k=1;k<=M.periods;k++)h+='<div class="'+(k===M.tempo?'cur':'')+'">'+t.period[k-1]+'</div>';
+   h+='<div class="h">Progr.</div>';for(k=1;k<=M.periods;k++)h+='<div class="'+(k===M.tempo?'cur':'')+'">'+(k<=M.tempo||M.editing?t.progressivo[k-1]:'–')+'</div>';
+   h+='<div class="h">Falli sq.</div>';for(k=1;k<=M.periods;k++)h+='<div class="'+(k===M.tempo?'cur':'')+'">'+t.team_fouls[k-1]+'</div>';h+='</div>';
+   var ros=(M.roster[s]||[]).map(function(id){return t.players.filter(function(p){return p.id===id})[0]});
+   h+='<b>Giocatori del tempo</b> <small style="color:#666">(in grigio: sostituiti)</small><table class="pl"><tr><th class="l">Giocatore</th><th>Canestri '+ts(M.tempo)+'</th><th>Tot</th><th>Falli</th><th>Azioni</th></tr>';
+   ros.forEach(function(p){var on_=p.on_field,dis=on_&&!p.fouled_out?'':' disabled',a='ev(\''+s+'\','+p.id+',';
+    h+='<tr class="'+(on_?'':'out')+'"><td class="l">'+esc(pname(p))+(on_?'':' <small>(sostituito)</small>')+'</td><td><b>'+sq(p.seq[M.tempo-1])+'</b> <small>('+p.pts[M.tempo-1]+')</small></td><td>'+p.total+'</td><td class="'+(p.fouled_out?'fo':'')+'">'+p.fouls+(p.fouled_out?' ⛔':'')+'</td>'+
+     '<td class="act"><button'+dis+' onclick="'+a+'\'points\',1)">+1</button><button'+dis+' onclick="'+a+'\'points\',2)">+2</button><button'+dis+' onclick="'+a+'\'points\',3)">+3</button><button class="f"'+dis+' onclick="'+a+'\'foul\')">Fallo</button></td></tr>'});h+='</table>';
+   h+='<b>Panchina</b><table><tr><th class="l">Giocatore</th><th>Tot</th><th>Falli</th><th></th></tr>';
+   if(!bench.length)h+='<tr><td colspan="4" style="color:#888">nessun giocatore in panchina</td></tr>';
+   bench.forEach(function(p){var pl=p.entries.indexOf(M.tempo)>=0;h+='<tr><td class="l">'+esc(pname(p))+(pl?' <small style="color:#666">(già entrato in questo tempo)</small>':'')+'</td><td>'+p.total+'</td><td class="'+(p.fouled_out?'fo':'')+'">'+p.fouls+(p.fouled_out?' ⛔':'')+'</td><td><button class="pri" style="padding:2px 12px;font-weight:700" '+(p.fouled_out?'disabled title="'+CFG.max_fouls+' falli: non può entrare"':'title="Fai entrare: scegli chi esce"')+' onclick="askSub(\''+s+'\','+p.id+')">+</button></td></tr>'});h+='</table>';
+   var items=M.events.filter(function(e){return e.side===s&&e.tempo===M.tempo}).map(function(e){return{k:e.id*2,e:e}}).concat(M.subs.filter(function(b){return b.side===s&&b.tempo===M.tempo}).map(function(b){return{k:b.after_event_id*2+1+b.id/100000,b:b}})).sort(function(x,y){return y.k-x.k});
+   var top=items[0],topUndo=!top?'':(top.e?'undo('+top.e.id+')':(top.b.undoable?'undoSub('+top.b.id+')':''));
+   h+='<div class="bar" style="margin:8px 0 4px"><b>Registro eventi</b><button '+(topUndo?'':'disabled')+' onclick="'+topUndo+'">↶ Annulla ultimo</button></div><div class="log">';
+   if(!items.length)h+='<div style="color:#888">nessun evento</div>';
+   items.forEach(function(it){if(it.e){var e=it.e;h+='<div><span>'+e.created+' · #'+e.number+' '+esc(e.name)+' · <b>'+(e.kind==='points'?'+'+e.value+' pt':'fallo')+'</b></span><button class="dng" style="padding:0 8px" onclick="undo('+e.id+')">×</button></div>'}
+    else{var b=it.b;h+='<div style="background:#eef4ff"><span>'+b.created+' · ⇄ entra <b>'+esc(b.in_name)+'</b>, esce <b>'+esc(b.out_name)+'</b></span>'+(b.undoable?'<button class="dng" style="padding:0 8px" onclick="undoSub('+b.id+')">×</button>':'')+'</div>'}});
+   h+='</div></div>'});
+  $('#main').innerHTML=h+'</div>'}
+async function ev(side,pid,kind,val){
+  var p=M.teams[side].players.filter(function(x){return x.id===pid})[0];if(!p||!p.on_field)return;
+  if(kind==='foul'&&p&&p.fouls+1>=CFG.max_fouls&&!confirm(pname(p)+': questo sarà il '+(p.fouls+1)+'° fallo (limite '+CFG.max_fouls+'). Registrare?'))return;
+  try{M=await api('/matches/'+M.id+'/event','POST',{player_id:pid,kind:kind,value:val||1});renderPlay();
+   if(kind==='foul'){var q=M.teams[side].players.filter(function(x){return x.id===p.id})[0];if(q&&q.fouled_out)setTimeout(function(){alert(pname(q)+' ha raggiunto '+CFG.max_fouls+' falli: deve uscire.')},50)}}catch(e){toast(e)}}
+function askSub(side,inId){var t=M.teams[side],pin=t.players.filter(function(p){return p.id===inId})[0],on=(M.court[side]||[]).map(function(id){return t.players.filter(function(p){return p.id===id})[0]});
+  var b='<div class="modal" onclick="if(event.target===this)closeModal()"><div class="box" style="max-width:520px"><h2 style="margin-top:0">Entra '+esc(pname(pin))+'</h2><p>Chi esce? Canestri e falli di chi esce restano registrati e contano nei totali.</p>';
+  on.forEach(function(p){b+='<button style="display:block;width:100%;text-align:left;margin:6px 0;padding:10px" onclick="doSub(\''+side+'\','+inId+','+p.id+')"><b>'+esc(pname(p))+'</b> — '+p.total+' pt, '+p.fouls+' falli'+(p.fouled_out?' ⛔':'')+'</button>'});
+  $('#modal').innerHTML=b+'<button onclick="closeModal()">Annulla</button></div></div>'}
+async function doSub(side,inId,outId){try{M=await api('/matches/'+M.id+'/sub','POST',{in:inId,out:outId});closeModal();renderPlay()}catch(e){toast(e)}}
+function editPeriods(){var b='';M.editable.forEach(function(k){b+='<button style="margin:4px" onclick="askReopen('+k+')">'+tl(k)+' ('+M.teams.A.period[k-1]+' – '+M.teams.B.period[k-1]+')</button>'});
+  $('#modal').innerHTML='<div class="modal" onclick="if(event.target===this)closeModal()"><div class="box" style="max-width:520px"><h2 style="margin-top:0">Modifica periodo</h2><p>Scegli il periodo da rifare. Si riparte dalla scelta dei giocatori.</p><div>'+b+'</div><div class="bar"><button onclick="closeModal()">Annulla</button></div></div></div>'}
+function askReopen(k){closeModal();if(!confirm('ATTENZIONE: modificare il '+tl(k).toLowerCase()+'?\n\nTutti i dati già salvati per questo periodo (giocatori in campo, entrate, sostituzioni, canestri e falli) verranno ELIMINATI e varranno solo i nuovi dati che inserirai. I punteggi e i progressivi dei periodi successivi saranno ricalcolati.\n\nL\'operazione non si può annullare. Continuare?'))return;reopen(k)}
+async function reopen(k){try{M=await api('/matches/'+M.id+'/reopen','POST',{tempo:k});route()}catch(e){toast(e)}}
+function askConfirm(msg,ok,fn){window._cf=fn;$('#modal').innerHTML='<div class="modal" onclick="if(event.target===this)closeModal()"><div class="box" style="max-width:480px"><h2 style="margin-top:0">Conferma</h2><p>'+esc(msg)+'</p><div class="bar"><button onclick="closeModal()">Annulla</button><button class="pri dng" onclick="var f=window._cf;closeModal();f()">'+esc(ok)+'</button></div></div></div>'}
+function undoSub(id){var b=M.subs.filter(function(x){return x.id===id})[0];if(!b)return;askConfirm('Annullare la sostituzione: entra '+b.in_name+', esce '+b.out_name+'?','Sì, annulla',function(){doUndoSub(id)})}
+async function doUndoSub(id){try{M=await api('/matches/'+M.id+'/undo_sub/'+id,'POST',{});renderPlay()}catch(e){toast(e)}}
+function undo(id){if(!id)return;var e=M.events.filter(function(x){return x.id===id})[0];if(!e)return;
+  askConfirm('Annullare '+(e.kind==='points'?'canestro da '+e.value+' '+(e.value===1?'punto':'punti'):'fallo')+' di #'+e.number+' '+e.name+'?','Sì, annulla',function(){doUndo(id)})}
+async function doUndo(id){try{M=await api('/matches/'+M.id+'/undo/'+id,'POST',{});renderPlay()}catch(e){toast(e)}}
+async function endTempo(){var last=!M.editing&&M.tempo>=M.n_tempi&&(!M.ot_enabled||M.under9);if(!confirm('Terminare il '+tl(M.tempo).toLowerCase()+' ('+M.teams.A.period[M.tempo-1]+' – '+M.teams.B.period[M.tempo-1]+')?'+(M.editing?' Terminata la modifica si torna alla situazione precedente e i totali vengono ricalcolati.':last?' Sarà la fine della partita.':(M.tempo>=M.n_tempi?' Se punti e progressivo sono in parità ti proporrò il supplementare.':''))))return;
+  try{M=await api('/matches/'+M.id+'/end_tempo','POST',{});route()}catch(e){toast(e)}}
+
+/* ---------- fine partita / riepilogo ---------- */
+function renderAskOt(){view='match';setHdr();var A=M.teams.A,B=M.teams.B;
+  $('#main').innerHTML='<div class="card" style="text-align:center"><h2>Parità: punti per periodo '+A.awarded_total+' – '+B.awarded_total+' e progressivo '+A.score+' – '+B.score+'</h2><p>'+esc(A.name)+' – '+esc(B.name)+'</p><p style="color:#555">Come da guida CSI si disputa un tempo supplementare (3 minuti) finché una squadra è avanti: la vincente ottiene '+(A.awarded_total+1)+' punti, la perdente '+A.awarded_total+'.</p><h3>Giochi il tempo supplementare?</h3>'+
+   '<button class="pri" onclick="decideOt(true)">Sì, gioca il supplementare</button> <button onclick="decideOt(false)">No, termina (pareggio)</button> <button onclick="showSummary()">Situazione riassuntiva</button></div>'}
+async function decideOt(play){try{M=await api('/matches/'+M.id+'/overtime','POST',{play:play});route()}catch(e){toast(e)}}
+function ffBanner(){return M.forfeit?'<div class="err" style="font-weight:700">⚠ '+esc(M.forfeit.text)+'</div>':''}
+function resBlock(){var r=M.result,A=M.teams.A,B=M.teams.B,why='';
+  if(r.reason==='progressivo')why=' – parità nei punti di periodo ('+A.awarded_total+'–'+B.awarded_total+'): vince chi è avanti nel progressivo ('+A.score+'–'+B.score+')';
+  else if(r.reason==='supplementare')why=' – parità anche nel progressivo: deciso dal supplementare';
+  else if(r.tie&&!M.forfeit)why=' – pareggio'+(M.under9?' (ammesso in Under 9)':'');
+  return '<p>Punteggio finale (punti per periodo): <b>'+r.final.A+' – '+r.final.B+'</b>'+(r.winner?'<br>Vince <b>'+esc(M.teams[r.winner].name)+'</b>':'')+esc(why)+(r.dts?'<br><small>DTS: sì (tempi supplementari)</small>':'')+'</p><p><small>Progressivo (canestri): '+A.score+' – '+B.score+'</small></p>'}
+function renderFinished(){view='match';setHdr();var A=M.teams.A,B=M.teams.B;
+  $('#main').innerHTML='<div class="card" style="text-align:center"><h2>Partita conclusa</h2>'+ffBanner()+(M.ot_stale?'<div class="warnbox">⚠ Dopo le modifiche i periodi regolari non sono più in parità: il tempo supplementare giocato non è più necessario (resta registrato nei punti).</div>':'')+'<div class="score">'+A.score+' – '+B.score+'</div><p>'+esc(A.name)+' – '+esc(B.name)+'</p>'+resBlock()+mvpBlock()+
+   '<button class="pri" onclick="downloadPdf()">Scarica PDF (A4 orizzontale, 1 foglio)</button> <button onclick="showSummary()">Situazione riassuntiva</button> <button onclick="showStats(M)">Statistiche</button> '+(M.editable.length?'<button onclick="editPeriods()">Modifica periodo</button> ':'')+(M.can_ot?'<button onclick="decideOt(true)">Aggiungi tempo supplementare</button> ':'')+(M.readonly?'<p style="color:#666">Partita del '+fmtDate(M.created).slice(0,10)+': sola consultazione.</p>':'')+'</div>'}
+function downloadPdf(){location.href='/api/matches/'+M.id+'/pdf'}
+function teamTable(s){var t=M.teams[s],h='<h3>Squadra '+s+': '+esc(t.name)+'</h3><div class="tscroll"><table><tr><th>N.</th><th class="l">Giocatore</th><th>Anno</th>'+Array.apply(null,Array(M.periods)).map(function(_,i){return '<th>'+ts(i+1)+'</th>'}).join('')+'<th>Tot</th><th>Falli</th></tr>';
+  t.players.forEach(function(p){h+='<tr><td>'+p.number+'</td><td class="l">'+esc(nm(p))+'</td><td>'+p.birth_year+'</td>'+p.seq.map(function(q,i){return'<td><b>'+(q.length?q.join(' '):'')+'</b>'+(q.length>1?'<br><small>='+p.pts[i]+'</small>':'')+'</td>'}).join('')+'<td><b>'+p.total+'</b></td><td class="'+(p.fouled_out?'fo':'')+'">'+p.fouls+'</td></tr>'});
+  return h+'<tr class="big"><td colspan="3" class="l">Punti nel tempo</td>'+t.period.map(function(v){return'<td>'+v+'</td>'}).join('')+'<td>'+t.score+'</td><td></td></tr></table></div>'}
+var tipEl=null;function tipShow(e,t){if(!tipEl){tipEl=document.createElement('div');tipEl.id='tip';document.body.appendChild(tipEl)}tipEl.textContent=t;tipEl.style.display='block';var x=Math.min(e.clientX+14,window.innerWidth-tipEl.offsetWidth-8),y=e.clientY+16;if(y+tipEl.offsetHeight>window.innerHeight)y=e.clientY-tipEl.offsetHeight-10;tipEl.style.left=Math.max(4,x)+'px';tipEl.style.top=Math.max(4,y)+'px'}
+function tipHide(){if(tipEl)tipEl.style.display='none'}
+document.addEventListener('mousemove',function(e){var t=e.target.closest&&e.target.closest('[data-tip]');if(t)tipShow(e,t.getAttribute('data-tip'));else tipHide()});
+document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('[data-tip]');if(t)tipShow(e,t.getAttribute('data-tip'));else tipHide()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')tipHide()});
+var TCOL={A:'#2563eb',B:'#ea580c'};
+function pl_(m,k){return k<=m.n_tempi?'T'+k:'Suppl.'}
+function pcol(i,n){return 'hsl('+Math.round((i*137.508)%360)+','+(i%2?62:74)+'%,'+(i%3===0?46:54)+'%)'}
+function tp(tips,i){return tips&&tips[i]?' class="sl" data-tip="'+esc(tips[i])+'"':''}
+function pieSvg(vals,cols,empty,sz,tips,tots){sz=sz||170;var tot=vals.reduce(function(a,b){return a+b},0),c=sz/2,r=sz/2-6,o='<svg viewBox="0 0 '+sz+' '+sz+'" style="width:'+sz+'px;max-width:100%" role="img">';
+  if(!tot)return o+'<circle class="nopts" cx="'+c+'" cy="'+c+'" r="'+r+'" fill="#d9dce3" stroke="#b9bdc8"/><text x="'+c+'" y="'+(c+5)+'" text-anchor="middle" font-size="'+(sz<200?13:16)+'" fill="#555">'+empty+'</text></svg>';
+  var ang=-Math.PI/2;
+  vals.forEach(function(v,i){if(!v)return;var f=v/tot,a2=ang+f*2*Math.PI,mid=(ang+a2)/2;
+   if(f>=0.9999)o+='<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="'+cols[i]+'" stroke="#fff" stroke-width="2"'+tp(tips,i)+'/>';
+   else{var x1=c+r*Math.cos(ang),y1=c+r*Math.sin(ang),x2=c+r*Math.cos(a2),y2=c+r*Math.sin(a2);o+='<path d="M'+c+','+c+' L'+x1+','+y1+' A'+r+','+r+' 0 '+(f>0.5?1:0)+' 1 '+x2+','+y2+' Z" fill="'+cols[i]+'" stroke="#fff" stroke-width="2"'+tp(tips,i)+'/>'}
+   if(f>=0.07){var tx=c+r*0.62*Math.cos(mid),ty=c+r*0.62*Math.sin(mid);o+='<text x="'+tx+'" y="'+(ty+(f>=0.14?-2:5))+'" text-anchor="middle" font-size="'+(f>=0.14?16:13)+'" font-weight="800" fill="#fff" stroke="rgba(0,0,0,.35)" stroke-width=".6" pointer-events="none">'+(tots?v+' / '+tots[i]:v)+'</text>';if(f>=0.14)o+='<text x="'+tx+'" y="'+(ty+12)+'" text-anchor="middle" font-size="11" fill="#fff" stroke="rgba(0,0,0,.3)" stroke-width=".4" pointer-events="none">'+(tots&&tots[i]?Math.round(v/tots[i]*100)+'%':Math.round(f*100)+'%')+'</text>'}
+   ang=a2});
+  return o+'</svg>'}
+function pieRow(m,t,cols,getv,unit,empty,totf){var n=m.periods,o='<div class="pies">';
+  for(var k=0;k<n;k++){var vals=t.players.map(function(p){return getv(p)[k]||0}),tot=vals.reduce(function(a,b){return a+b},0);
+   var tips=t.players.map(function(p){var v=getv(p)[k]||0;return '#'+p.number+' '+nm(p)+' · '+v+' '+(v===1?'punto':'punti')+' su '+tot+' nel '+pl_(m,k+1)+' ('+(tot?Math.round(v/tot*100):0)+'%)'}),tots=t.players.map(function(){return tot});
+   o+='<div class="pie"><b>'+pl_(m,k+1)+'</b>'+pieSvg(vals,cols,empty,170,tips,tots)+'<small>'+(tot?tot+' '+unit:'—')+'</small></div>'}
+  return o+'</div>'}
+function showStats(m){if(!m)return;var A=m.teams.A,B=m.teams.B,n=m.periods;
+
+  var h='<div class="modal fs"><div class="box stat"><div class="bar stbar"><h2 style="margin:0">Statistiche – '+esc(A.name)+' vs '+esc(B.name)+'</h2><button class="pri" onclick="closeModal()" style="min-height:48px;min-width:110px">Chiudi ✕</button></div>';
+  if(m.forfeit)h+='<div class="err"><b>'+esc(m.forfeit.text)+'</b></div>';
+  ['A','B'].forEach(function(s){var t=m.teams[s],np=t.players.length,cols=t.players.map(function(p,i){return pcol(i,np)});
+   h+='<section class="tsec"><h2 style="border-left:8px solid '+TCOL[s]+';padding-left:10px">'+esc(t.name)+' <small>'+t.score+' punti</small></h2><div class="sgrid"><aside class="plist"><b>Giocatori</b>';
+   t.players.forEach(function(p,i){h+='<div class="pli"><i style="background:'+cols[i]+'"></i><span class="nbadge">'+p.number+'</span><span class="nm">'+esc(nm(p))+'</span><small>'+p.total+' pt</small></div>'});
+   h+='</aside><div><h3>Punti segnati per tempo <small style="font-weight:400;color:#556">(etichetta: punti del giocatore / punti totali della squadra nel tempo)</small></h3>'+pieRow(m,t,cols,function(p){return p.pts},'pt','nessun punto segnato',function(p){return p.total})+
+    '<h3>Riepilogo punti segnati dai giocatori</h3><div class="pies"><div class="pie big"><b>Totale</b>'+pieSvg(t.players.map(function(p){return p.total}),cols,'nessun punto segnato',240,t.players.map(function(p){return '#'+p.number+' '+nm(p)+' · '+p.total+' pt totali ('+(t.score?Math.round(p.total/t.score*100):0)+'% della squadra)'}))+'<small>'+t.score+' pt</small></div></div>';
+   h+='</div></div></section>'});
+  var mx=Math.max(1,A.score,B.score),bar=function(t,c,y){var w=(A.score||B.score?t.score/mx:0)*430;return '<text x="10" y="'+(y+24)+'" font-size="17" font-weight="700">'+esc(t.name)+'</text><rect x="210" y="'+y+'" width="'+Math.max(w,2)+'" height="34" rx="4" fill="'+c+'"/><text x="'+(218+w)+'" y="'+(y+25)+'" font-size="22" font-weight="800">'+t.score+'</text>'};
+  h+='<section class="tsec"><h2>Punti totali per squadra</h2>'+(m.phase==='finished'?'<p style="text-align:left">Risultato finale (punti per periodo): <b>'+m.result.final.A+' – '+m.result.final.B+'</b>'+(m.result.reason?' (13-12 per '+m.result.reason+')':'')+'</p>':'')+'<svg viewBox="0 0 700 110" style="max-width:760px;width:100%" role="img">'+bar(A,TCOL.A,8)+bar(B,TCOL.B,60)+'</svg></section></div></div>';
+  $('#modal').innerHTML=h;var bx=$('#modal .box');if(bx)bx.scrollTop=0}
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.querySelector('#modal .modal.fs'))closeModal()});
+function showSummary(){if(!M)return;var A=M.teams.A,B=M.teams.B;
+  var h='<div class="modal" onclick="if(event.target===this)closeModal()"><div class="box"><div class="bar"><h2 style="margin:0">Situazione riassuntiva – '+(M.phase==='finished'?'finale':M.phase==='ask_ot'?'tempi conclusi':tl(M.tempo))+'</h2><button onclick="closeModal()">Chiudi ✕</button></div>';
+  h+=ffBanner();if(M.phase==='finished')h+=resBlock();h+='<div class="split"><div>'+teamTable('A')+'</div><div>'+teamTable('B')+'</div></div><h3>Parziali e progressivo</h3><div class="tscroll" id="parz"><table class="parz"><tr><th rowspan="2">Squadra</th>';
+  for(var k=1;k<=M.periods;k++)h+='<th colspan="4">'+tl(k)+'</th>';h+='<th rowspan="2">Finale</th></tr><tr>';
+  for(k=1;k<=M.periods;k++)h+='<th>Punti</th><th>Progr.</th><th>Falli sq.</th><th>Assegn.</th>';h+='</tr>';
+  [A,B].forEach(function(t){h+='<tr><td class="l"><b>'+esc(t.name)+'</b></td>';for(var k=0;k<M.periods;k++){var played=k<M.tempo||M.phase==='finished'||M.phase==='ask_ot';h+='<td>'+t.period[k]+'</td><td><b>'+(played?t.progressivo[k]:'–')+'</b></td><td>'+t.team_fouls[k]+'</td><td>'+(t.awarded[k]==null?'–':t.awarded[k])+'</td>'}h+='<td class="big">'+t.score+' <small>(finale '+t.final+(M.result.provisional?' prov.':'')+')</small></td></tr>'});
+  h+='</table></div><p><small>Assegnati per periodo concluso: vittoria 3, pareggio 2, sconfitta 1; a parità di punti vince chi è avanti nel progressivo (13-12), poi supplementari (13-12). I supplementari non assegnano punti di periodo. Nelle celle: i singoli canestri in ordine (sotto il subtotale se più di uno). Falli personali: limite '+CFG.max_fouls+' (evidenziato in rosso).</small></p>';
+  if(M.phase==='finished')h+='<button class="pri" onclick="downloadPdf()">Scarica PDF</button>';
+  $('#modal').innerHTML=h+'</div></div>'}
+function closeModal(){$('#modal').innerHTML=''}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal()});
+(async function(){CFG=await api('/config');(await api('/matches')).forEach(function(x){if(x.phase!=='finished'&&!x.readonly&&!ACTIVE)ACTIVE=x.id});var h=location.hash,g=h.match(/^#m(\d+)(s?)$/);
+  if(h==='#nuova'&&!ACTIVE)return newMatch();if(g){await openMatch(+g[1]);if(g[2])showSummary();return}goHome()})();
+</script></body></html>
